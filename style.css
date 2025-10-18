@@ -1,3 +1,8 @@
+/* Lab 3 4.1 */
+html{
+  color-scheme: light dark;
+}
+
 body {
   /* Set line height to 1.5 times the font size
 	   and use the OS’s UI font as the website font
@@ -8,16 +13,24 @@ body {
   max-width: 100ch;
   margin-inline: auto;
   padding: 0 1em;
-  background-color: #f7f7f7;
+  background: canvas;
+  color: canvastext;
 }
 
+a{color: inherit; }
 nav {
   display: flex;
   text-align: center;
   margin-bottom: 1em;
-  border-bottom: 1px solid oklch(80% 3% 200);
+  border-bottom: 1px solid var(--border-color);
   padding: 0.5em 0;
 }
+nav {
+  --border-color: oklch(50% 10% 200 / 40%);
+  border-bottom-color: var(--border-color);
+}
+
+
 
 nav a {
   border-bottom: 0.4em solid oklch(80% 3% 200);
@@ -107,4 +120,24 @@ label{
   margin: 2rem auto;  
   border-radius: 20px; /* round edging */
 }
+
+
+/* 4.3 */
+.color-scheme {
+  position: absolute;   /* takes it out of normal flow */
+  top: 1rem;            /* distance from top */
+  right: 1rem;          /* distance from right edge */
+  font-size: 80%;       /* make it a little smaller */
+  font-family: inherit; /* match the rest of the site */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-scheme select {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+
 
