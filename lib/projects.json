@@ -1,0 +1,75 @@
+[
+    {
+    "title": "Java banking app",
+    "year": "2023",
+    "image": "images/meme01.jpeg",
+    "description": "OOP application with java"
+  },
+  {
+    "title": "Ice man project",
+    "year": "2024",
+    "image": "images/meme01.jpeg",
+    "description": "object oriented game with C++"
+  },
+  {
+    "title": "Web scraping data",
+    "year": "2023",
+    "image": "images/meme01.jpeg",
+    "description": "Web scraping data from soccer websites with python libraries"
+  },
+  {
+    "title": "Machine learning",
+    "year": "2024",
+    "image": "images/meme01.jpeg",
+    "description": "Peform predictive modeling on previous scraped data"
+  },
+  {
+    "title": "Recipes and Ratings Report",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "Data science project on recipes and ratings"
+  },
+  {
+    "title": "SIO iceberg hw",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "Analyzed icebergs"
+  },
+  {
+    "title": "ECON hw1",
+    "year": "2024",
+    "image": "images/meme01.jpeg",
+    "description": "risk benefit analysis"
+  },
+  {
+    "title": "LIGN 8 hw 4",
+    "year": "2024",
+    "image": "images/meme01.jpeg",
+    "description": "dove into NLP"
+  },
+  {
+    "title": "dsc 100 hw1",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "simple SQLite queries"
+  },
+  {
+    "title": "dsc 100 hw3",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "Working with PostGreSQL and pgAdmin"
+  },
+  {
+    "title": "CSE 158R hw1",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "working with regression and classification"
+  },
+  {
+    "title": "dsc 106 project 1",
+    "year": "2025",
+    "image": "images/meme01.jpeg",
+    "description": "insightful data visualization"
+  }
+]
+
