@@ -31,6 +31,7 @@ let pages = [
   { url: 'projects/', title: 'Projects'},
   { url: 'contact/', title: 'Contact'},
   { url: 'resume/', title: 'Resume'},
+  { url: 'meta/', title: "Meta" },
   { url: 'https://github.com/bryannbr', title: 'Github'},
 ];
 
@@ -165,10 +166,13 @@ export function renderProjects(projects, container, headingLevel = 'h2') {
 
     // Build the articles with a template literal
     const html = projects.map(p => `
-      <article>
-        <${headingLevel}>${p.title}</${headingLevel}>
-        <img src="${p.image}" alt="${p.title}">
-        <p>${p.description}</p>
+      <article class="project">
+        <${headingLevel} class="project__title">${p.title}</${headingLevel}>
+        <img class="project__img" src="${p.image}" alt="${p.title}">
+        <div class="project__text">
+          <p class="project__desc">${p.description}</p>
+          <span class="project__year">c. ${p.year}</span>
+        </div>
       </article>
     `).join('');
 

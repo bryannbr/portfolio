@@ -155,3 +155,188 @@ label{
   margin: 0;
 }
 
+.project__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .5rem;
+  margin-top: 0.75rem;
+}
+
+.project__year {
+  font-family: Baskerville, Georgia, serif;
+  font-style: italic;
+  font-variant-numeric: oldstyle-nums;
+  color: #6b7280; /* subtle gray */
+  white-space: nowrap;
+}
+
+
+/* l5 2.2 */
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  gap: 0.75em;
+  list-style: none;
+  padding: 1em;
+  margin: 1em 0;
+  border: 1px solid #ccc;
+  border-radius: 0.5em;
+  max-width: 25em;
+}
+
+/* Individual list items */
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 9em;
+}
+
+/* Color swatch box */
+.legend .swatch {
+  width: 1em;
+  height: 1em;
+  aspect-ratio: 1 / 1;
+  background: var(--color);
+  border-radius: 0.2em;
+  display: inline-block;
+}
+
+/* 2.3 */
+.container {
+  display: flex;
+  align-items: center;   /* vertical align */
+  gap: 1.25rem;          /* space between pie and legend */
+  flex-wrap: wrap;       /* stack on small screens */
+}
+
+/* keep the svg a nice size; the viewBox handles scaling */
+.container svg {
+  width: 260px;
+  height: 260px;
+}
+
+/* let legend take remaining horizontal space */
+.container .legend {
+  flex: 1;
+}
+
+
+/* 5.1 */
+
+#projects-pie-plot:has(path:hover) path:not(:hover) {
+  opacity: 0.5;
+}
+
+#projects-pie-plot path {
+  transition: opacity 300ms;
+  cursor: pointer;
+}
+
+/* lab 06 1.3 */
+dl.stats {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+  margin: 1rem 0;
+}
+
+dl.stats dt {
+  font-weight: 600;
+}
+
+dl.stats dd {
+  margin: 0;
+}
+
+/* 2.3 */
+.gridlines line {
+  stroke: #999;
+  stroke-opacity: 0.2;
+}
+
+.gridlines path {
+  stroke-width: 0; /* hide the axis line */
+}
+
+/* 3.1 */
+circle {
+  transition: 200ms;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+circle:hover {
+  transform: scale(1.5);
+}
+
+dl.info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4em 1.2em;
+}
+
+.tooltip {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+}
+
+/* 3.2 */
+/* base info grid (labels left, values right) */
+dl.info {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .25rem 1rem;
+  margin: 0;
+  transition-duration: 500ms;
+  transition-property: opacity, visibility;
+}
+dl.info dt { opacity: .6; }
+dl.info[hidden]:not(:hover, :focus-within) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* tooltip look & behavior */
+.tooltip {
+  position: fixed;        /* so it can follow the cursor */
+  top: 1rem;              /* default off-corner before first hover */
+  left: 1rem;
+  pointer-events: none;   /* don’t block mouseover on dots */
+  z-index: 1000;
+
+  padding: .6rem .8rem;
+  border-radius: .5rem;
+  background: rgba(255,255,255,.9);      /* subtle frosted look */
+  box-shadow: 0 8px 24px rgba(0,0,0,.12),
+              0 2px 8px rgba(0,0,0,.08);
+  backdrop-filter: saturate(140%) blur(4px);
+  -webkit-backdrop-filter: saturate(140%) blur(4px);
+  border: 1px solid rgba(0,0,0,.06);
+  font-size: .95rem;
+  line-height: 1.25;
+  dl.info {
+    transition-duration: 500ms;
+    transition-property: opacity, visibility;
+  }
+
+  dl.info[hidden]:not(:hover, :focus-within) {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* optional: hover feedback on points */
+circle {
+  transition: transform 200ms;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+circle:hover { transform: scale(1.5); }
+
+/* 5.4 */
+circle.selected {
+  fill: #ff6b6b;
+}
