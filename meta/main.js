@@ -1,8 +1,24 @@
 // meta/main.js
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+import scrollama from 'https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm';  // ← new
 
 let xScale;
 let yScale;
+
+
+// Step 1.1 lab 8
+let commitProgress = 100;
+let timeScale;
+let commitMaxTime;
+
+// 2.4
+const colors = d3.scaleOrdinal(d3.schemeTableau10);
+
+
+
+
+
+
 
 
 
@@ -72,6 +88,102 @@ function processCommits(data) {
 
 const commits = processCommits(data);
 console.log(commits);
+
+// Step 1.2 lab 8 — start with all commits selected
+let filteredCommits = commits;
+
+
+
+
+//2.1 lab 8
+function updateFileDisplay(filteredCommits) {
+  // all line records for the currently visible commits
+  const lines = filteredCommits.flatMap((d) => d.lines);
+
+  // group those lines by file name
+  const files = d3
+    .groups(lines, (d) => d.file)
+    .map(([name, lines]) => ({ name, lines }))
+    .sort((a, b) => b.lines.length - a.lines.length);
+
+  // bind files to <div> elements inside #files
+  const filesContainer = d3
+    .select('#files')
+    .selectAll('div')
+    .data(files, (d) => d.name)
+    .join(
+      // runs only when a file's <div> is first created
+      (enter) =>
+        enter.append('div').call((div) => {
+          div.append('dt').append('code');
+          div.append('dd');
+        }),
+    );
+
+  // update filename text
+  filesContainer
+    .select('dt > code')
+    .text((d) => d.name);
+
+  // update line-count text
+  filesContainer
+    filesContainer
+    .select('dd')
+    .selectAll('div')
+    .data((d) => d.lines)
+    .join('div')
+    .attr('class', 'loc')
+    .attr('style', d => `--color: ${colors(d.type)}`);
+}
+
+
+
+
+// Step 1.1 lab 08 — time scale for mapping 0–100 to actual timestamps
+timeScale = d3.scaleTime()
+  .domain([
+    d3.min(commits, d => d.datetime),
+    d3.max(commits, d => d.datetime)
+  ])
+  .range([0, 100]);
+
+// Convert slider % → date
+commitMaxTime = timeScale.invert(commitProgress);
+
+
+function onTimeSliderChange() {
+  const slider = document.querySelector("#commit-progress");
+  const timeEl = document.querySelector("#commit-time");
+
+  // 1) update percentage
+  commitProgress = +slider.value;
+
+  // 2) map 0–100 → actual Date
+  commitMaxTime = timeScale.invert(commitProgress);
+
+  // 3) show the date/time
+  timeEl.textContent = commitMaxTime.toLocaleString();
+
+  // Step 1.2 — filter commits up to this time
+  filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+
+  // Step 1.2 — update the scatter plot using filteredCommits
+  updateScatterPlot(data, filteredCommits);
+  updateFileDisplay(filteredCommits);
+}
+
+
+const slider = document.querySelector("#commit-progress");
+if (slider) {
+  slider.addEventListener("input", onTimeSliderChange);
+}
+
+
+
+
+
+
+
 
 function renderCommitInfo(data, commits) {
   // create the <dl>
@@ -242,7 +354,7 @@ function renderScatterPlot(data, commits) {
 
   dots
     .selectAll('circle')
-    .data(sortedCommits)
+    .data(sortedCommits, d => d.id)
     .join('circle')
     .attr('cx', d => xScale(d.datetime))
     .attr('cy', d => yScale(d.hourFrac))
@@ -303,6 +415,7 @@ function renderScatterPlot(data, commits) {
   svg
     .append('g')
     .attr('transform', `translate(0, ${usableArea.bottom})`)
+    .attr('class', 'x-axis')   // NEW
     .call(xAxis);
 
   // Y axis (left) — formatted like clock times
@@ -312,15 +425,151 @@ function renderScatterPlot(data, commits) {
   svg
     .append('g')
     .attr('transform', `translate(${usableArea.left}, 0)`)
+    .attr('class', 'y-axis')   // (for consistency)
     .call(yAxis);
 
 
     createBrushSelector(svg);
 
 }
+//lab 08 1.2
+function updateScatterPlot(data, commits) {
+  const width = 1000;
+  const height = 600;
+
+  const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+  const usableArea = {
+    left: margin.left,
+    right: width - margin.right,
+    top: margin.top,
+    bottom: height - margin.bottom,
+    width: width - margin.left - margin.right,
+    height: height - margin.top - margin.bottom,
+  };
+
+  // Select the existing SVG and groups
+  const svg = d3.select('#chart').select('svg');
+
+  // Update x-scale domain based on FILTERED commits
+  xScale.domain(d3.extent(commits, d => d.datetime));
+
+  // Recompute size scale
+  const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
+  const rScale = d3.scaleSqrt()
+    .domain([minLines, maxLines])
+    .range([2, 30]);
+
+  const xAxis = d3.axisBottom(xScale);
+
+  // === Update the existing x-axis (no new <g>) ===
+  const xAxisGroup = svg.select('g.x-axis');
+  xAxisGroup.selectAll('*').remove();
+  xAxisGroup.call(xAxis);
+
+  // === Update dots ===
+  const dots = svg.select('g.dots');
+  const sortedCommits = commits.slice().sort((a, b) => b.totalLines - a.totalLines);
+
+  dots
+    .selectAll('circle')
+    .data(sortedCommits, d => d.id)   // key by commit id
+    .join('circle')
+    .attr('cx', d => xScale(d.datetime))
+    .attr('cy', d => yScale(d.hourFrac))
+    .attr('r', d => rScale(d.totalLines))
+    .attr('fill', 'steelblue')
+    .on('mouseenter', (event, commit) => {
+      renderTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+      d3.select(event.target).attr('fill', 'orange');
+    })
+    .on('mousemove', (event) => {
+      updateTooltipPosition(event);
+    })
+    .on('mouseleave', (event) => {
+      updateTooltipVisibility(false);
+      d3.select(event.target).attr('fill', 'steelblue');
+    });
+}
+// 3.2 – generate commit text for scrollytelling
+d3.select('#scatter-story')
+  .selectAll('.step')
+  .data(commits)
+  .join('div')
+  .attr('class', 'step')
+  .html((d, i) => {
+    const dateString = d.datetime.toLocaleString('en', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+    });
+
+    const linkText =
+      i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious';
+
+    const fileCount = d3.rollups(
+      d.lines,
+      (D) => D.length,
+      (line) => line.file,
+    ).length;
+
+    return `
+      On ${dateString},
+      I made <a href="${d.url}" target="_blank">${linkText}</a>.
+      I edited ${d.totalLines} lines across ${fileCount} files.
+      Then I looked over all I had made, and I saw that it was very good.
+    `;
+  });
+
+function onStepEnter(response) {
+  // Commit associated with the step that crossed the midpoint
+  const commit = response.element.__data__;
+
+  // 1. Update "max time" to this commit's datetime
+  commitMaxTime = commit.datetime;
+
+  // 2. Get DOM elements we need
+  const sliderEl = document.querySelector('#commit-progress');
+  const timeEl  = document.querySelector('#commit-time');
+
+  // 3. Keep slider in sync with scroll position
+  //    (map date -> percentage using the same timeScale)
+  commitProgress = timeScale(commitMaxTime);
+  if (sliderEl) {
+    sliderEl.value = commitProgress;
+  }
+
+  // 4. Update the text under the slider
+  if (timeEl) {
+    timeEl.textContent = commitMaxTime.toLocaleString('en-US', {
+      dateStyle: 'short',
+      timeStyle: 'medium',
+    });
+  }
+
+  // 5. Filter commits up to this time (same as onTimeSliderChange)
+  filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+
+  // 6. Update the visualizations
+  updateScatterPlot(data, filteredCommits);
+  updateFileDisplay(filteredCommits);
+}
+
+// Scrollama
+const scroller = scrollama();
+
+scroller
+  .setup({
+    container: '#scrolly-1',
+    step: '#scrolly-1 .step',
+  })
+  .onStepEnter(onStepEnter);
 
 
 renderCommitInfo(data, commits);
 renderScatterPlot(data, commits);
+
+updateFileDisplay(filteredCommits);
+onTimeSliderChange();
 
 
